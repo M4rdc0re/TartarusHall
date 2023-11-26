@@ -141,11 +141,11 @@
     <ClCompile Include="Debug.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="ApiHashing.c" />
+    <ClCompile Include="RC4.c" />
     <ClCompile Include="Structs.h" />
     <ClCompile Include="TartarusHall.c" />
     <ClCompile Include="Unhook.c" />
-    <ClCompile Include="WinApi.c" />
-    <ClCompile Include="XOR.c" />
+    <ClCompile Include="Win32.c" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="HellsHall.asm">

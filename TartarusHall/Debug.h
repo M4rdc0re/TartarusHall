@@ -1,6 +1,5 @@
 #pragma once
 #include <Windows.h>
-#include "Structs.h"
 
 // uncomment to enable debug mode
 //\

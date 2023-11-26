@@ -14,7 +14,7 @@ HANDLE GetConsoleHandle() {
 	if (g_hConsole != INVALID_HANDLE_VALUE)
 		return g_hConsole;
 
-	if (!SetConsoleTitleA("AtomLdr Debugging Console")) {
+	if (!SetConsoleTitleA("Debugging Console")) {
 		if (!FreeConsole() || !AllocConsole())
 			return NULL;
 	}

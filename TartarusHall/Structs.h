@@ -2,9 +2,10 @@
 #include <Windows.h>
 
 #define NtCurrentProcess() ((HANDLE)(LONG_PTR)-1)
-#define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 
 #define OBJ_CASE_INSENSITIVE	0x00000040
+
+#define TH32CS_SNAPTHREAD   0x4
 
 #define InitializeObjectAttributes( p, n, a, r, s ) {   \
     (p)->Length = sizeof( OBJECT_ATTRIBUTES );          \
@@ -14,6 +15,23 @@
     (p)->SecurityDescriptor = s;                        \
     (p)->SecurityQualityOfService = NULL;               \
 }
+
+typedef struct {
+	DWORD	Length;         
+	DWORD	MaximumLength;  
+	PVOID	Buffer;         
+
+} USTRING;
+
+typedef struct _THREADENTRY32 {
+	DWORD dwSize;
+	DWORD cntUsage;
+	DWORD th32ThreadID;
+	DWORD th32OwnerProcessID;
+	LONG tpBasePri;
+	LONG tpDeltaPri;
+	DWORD dwFlags;
+} THREADENTRY32, * PTHREADENTRY32, * LPTHREADENTRY32;
 
 typedef struct _LSA_UNICODE_STRING {
 	USHORT Length;

@@ -1,6 +1,6 @@
 #include <Windows.h>
-#include "Structs.h"
 #include "Common.h"
+#include "Debug.h"
 
 HMODULE GetModuleHandleH(DWORD dwModuleHash) {
 	if (dwModuleHash == NULL)
@@ -67,9 +67,6 @@ FARPROC GetProcAddressH(HMODULE hModule, DWORD dwApiHash) {
 		if (HASH(FunctionName) == dwApiHash) {
 			FunctionAddressArray += (DEREF_16(FunctionOrdinalAddressArray) * sizeof(DWORD));
 			pFunctionAddress = (UINT64)(DllBaseAddress + DEREF_32(FunctionAddressArray));
-			/*
-			// forwarded functions support : https://github.com/NUL0x4C/APCLdr/blob/main/APCLdr/ApiHashing.c#L111
-			// this part is unnecessary - bcz we are not working with any forwarded function
 			if (pDataDir->VirtualAddress <= DEREF_32(FunctionAddressArray) && (pDataDir->VirtualAddress + pDataDir->Size) >= DEREF_32(FunctionAddressArray)) {
 				CHAR Library[MAX_PATH] = { 0 };
 				CHAR Function[MAX_PATH] = { 0 };
@@ -80,14 +77,40 @@ FARPROC GetProcAddressH(HMODULE hModule, DWORD dwApiHash) {
 				_memcpy((PVOID)Library, (PVOID)pFunctionAddress, Index);
 				_memcpy((PVOID)Function, (PVOID)((ULONG_PTR)pFunctionAddress + Index + 1), _StrlenA((LPCSTR)((ULONG_PTR)pFunctionAddress + Index + 1)));
 				if ((hModule2 = LoadLibraryH(Library)) != NULL) {
-					pFunctionAddress = (UINT64)GetProcAddressH(hModule2, HASHa(Function));
+					pFunctionAddress = (UINT64)GetProcAddressH(hModule2, HASH(Function));
 				}
 			}
-			*/
 			break;
 		}
 		FunctionNameAddressArray += sizeof(DWORD);
 		FunctionOrdinalAddressArray += sizeof(WORD);
 	}
 	return (FARPROC)pFunctionAddress;
+}
+
+HMODULE LoadLibraryH(LPSTR DllName) {
+
+	UNICODE_STRING	Ustr = { 0 };
+	WCHAR			wDllName[MAX_PATH] = { 0 };
+	NTSTATUS		STATUS = 0x00;
+	HMODULE			hModule = NULL;
+
+	_CharToWchar(wDllName, DllName, _StrlenA(DllName));
+
+	USHORT DestSize = _StrlenW(wDllName) * sizeof(WCHAR);
+	Ustr.Length = DestSize;
+	Ustr.MaximumLength = DestSize + sizeof(WCHAR);
+	Ustr.Buffer = wDllName;
+
+
+	fnLdrLoadDll pLdrLoadDll = (fnLdrLoadDll)GetProcAddressH(GetModuleHandleH(NTDLLDLL_CRC32), LdrLoadDll_CRC32);
+	if (pLdrLoadDll != NULL && (STATUS = pLdrLoadDll(NULL, 0, &Ustr, &hModule)) == 0x0) {
+		return hModule;
+	}
+
+#ifdef DEBUG
+	PRINTW(L"[!] LdrLoadDll Faild To Load \"%s\" 0x%0.8X \n", wDllName, STATUS);
+#endif // DEBUG
+
+	return NULL;
 }

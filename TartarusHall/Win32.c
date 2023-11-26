@@ -1,8 +1,7 @@
 #include <Windows.h>
-#include "Structs.h"
 #include "Common.h"
 
-unsigned int crc32h(char* message) {
+unsigned int _crc32h(char* message) {
     int i, crc;
     unsigned int byte, c;
     const unsigned int g0 = SEED, g1 = g0 >> 1,
@@ -23,15 +22,45 @@ unsigned int crc32h(char* message) {
     return ~crc;
 }
 
-extern void* __cdecl memset(void*, int, size_t);
-#pragma intrinsic(memset)
-#pragma function(memset)
-void* __cdecl memset(void* pTarget, int value, size_t cbTarget) {
-	unsigned char* p = (unsigned char*)pTarget;
-	while (cbTarget-- > 0) {
-		*p++ = (unsigned char)value;
-	}
-	return pTarget;
+SIZE_T _CharToWchar(PWCHAR Destination, PCHAR Source, SIZE_T MaximumAllowed)
+{
+    INT Length = (INT)MaximumAllowed;
+
+    while (--Length >= 0) {
+        if (!(*Destination++ = *Source++))
+            return MaximumAllowed - Length - 1;
+    }
+
+    return MaximumAllowed - Length;
+}
+
+SIZE_T _StrlenA(LPCSTR String)
+{
+
+    LPCSTR String2;
+
+    for (String2 = String; *String2; ++String2);
+
+    return (String2 - String);
+}
+
+SIZE_T _StrlenW(LPCWSTR String)
+{
+
+    LPCWSTR String2;
+
+    for (String2 = String; *String2; ++String2);
+
+    return (String2 - String);
+}
+
+UINT32 _CopyDotStr(PCHAR String)
+{
+    for (UINT32 i = 0; i < _StrlenA(String); i++)
+    {
+        if (String[i] == '.')
+            return i;
+    }
 }
 
 VOID _RtlInitUnicodeString(PUNICODE_STRING target, PCWSTR source)

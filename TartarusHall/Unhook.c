@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include "Structs.h"
 #include "Common.h"
 #include "Debug.h"
 
@@ -103,7 +102,7 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 			ClientId.UniqueThread = (PVOID)Thr32.th32ThreadID;
 
 			SET_SYSCALL(NTAPIs.NtOpenThread);
-			if (!NT_SUCCESS((STATUS = RunSyscall(&hThread, GENERIC_ALL, &ObjAttr, &ClientId)))) {
+			if (STATUS = RunSyscall(&hThread, GENERIC_ALL, &ObjAttr, &ClientId) != 0x00 ) {
 #ifdef DEBUG
 				PRINTA("[!] NtOpenThread Failed With Status : 0x%0.8X \n", STATUS);
 #endif // DEBUG
@@ -115,7 +114,7 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 #endif // DEBUG
 
 				SET_SYSCALL(NTAPIs.NtSuspendThread);
-				if (hThread && !NT_SUCCESS(STATUS = RunSyscall(hThread, NULL))) {
+				if (hThread && (STATUS = RunSyscall(hThread, NULL)) != 0x00 ) {
 #ifdef DEBUG
 					PRINTA("[!] NtSuspendThread Failed With Status : 0x%0.8X \n", STATUS);
 #endif // DEBUG
@@ -131,7 +130,7 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 				PRINTA("\t\t>>> Resuming Thread Of Id : %d ... ", Thr32.th32ThreadID);
 #endif // DEBUG
 				SET_SYSCALL(NTAPIs.NtResumeThread);
-				if (hThread && !NT_SUCCESS(STATUS = RunSyscall(hThread, NULL))) {
+				if (hThread && (STATUS = RunSyscall(hThread, NULL)) != 0x00 ) {
 #ifdef DEBUG
 					PRINTA("[!] NtResumeThread Failed With Status : 0x%0.8X \n", STATUS);
 #endif // DEBUG
@@ -174,7 +173,7 @@ LPVOID GetDllFromKnownDll(IN PWSTR DllName) {
 	InitializeObjectAttributes(&ObjAtr, &UniStr, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
 	SET_SYSCALL(NTAPIs.NtOpenSection);
-	if (!NT_SUCCESS((STATUS = RunSyscall(&hSection, SECTION_MAP_READ, &ObjAtr)))) {
+	if (STATUS = RunSyscall(&hSection, SECTION_MAP_READ, &ObjAtr) != 0x00 ) {
 #ifdef DEBUG
 		PRINTW(L"[!] NtOpenSection Failed For \"%s\" With Status : 0x%0.8X [THAT'S PROB OK]\n", FullName, STATUS);
 #endif // DEBUG
@@ -182,7 +181,7 @@ LPVOID GetDllFromKnownDll(IN PWSTR DllName) {
 	}
 
 	SET_SYSCALL(NTAPIs.NtMapViewOfSection);
-	if (!NT_SUCCESS((STATUS = RunSyscall(hSection, NtCurrentProcess(), &pModule, NULL, NULL, NULL, &ViewSize, 1, NULL, PAGE_READONLY)))) {
+	if (STATUS = RunSyscall(hSection, NtCurrentProcess(), &pModule, NULL, NULL, NULL, &ViewSize, 1, NULL, PAGE_READONLY) != 0x00 ) {
 #ifdef DEBUG
 		PRINTW(L"[!] NtMapViewOfSection Failed For \"%s\" With Status : 0x%0.8X \n", FullName, STATUS);
 #endif // DEBUG
@@ -276,7 +275,7 @@ BOOL RefreshAllDlls() {
 #endif // DEBUG
 				
 				SET_SYSCALL(NTAPIs.NtProtectVirtualMemory);
-				if (!NT_SUCCESS((STATUS = RunSyscall((HANDLE)-1, &pAddress, &sSize, PAGE_READWRITE, &dwOldPermission)))) {
+				if (STATUS = RunSyscall(NtCurrentProcess(), &pAddress, &sSize, PAGE_READWRITE, &dwOldPermission) != 0x00) {
 #ifdef DEBUG
 					PRINTA("[!] NtProtectVirtualMemory [1] Failed With Status : 0x%0.8X \n", STATUS);
 #endif // DEBUG
@@ -286,7 +285,7 @@ BOOL RefreshAllDlls() {
 				_memcpy(pLocalTxtAddress, pRemoteTxtAddress, sLocalTxtSize);
 
 				SET_SYSCALL(NTAPIs.NtProtectVirtualMemory);
-				if (!NT_SUCCESS((STATUS = RunSyscall((HANDLE)-1, &pAddress, &sSize, dwOldPermission, &dwOldPermission)))) {
+				if (STATUS = RunSyscall(NtCurrentProcess(), &pAddress, &sSize, dwOldPermission, &dwOldPermission) != 0x00) {
 #ifdef DEBUG
 					PRINTA("[!] NtProtectVirtualMemory [2] Failed With Status : 0x%0.8X \n", STATUS);
 #endif // DEBUG
@@ -295,7 +294,7 @@ BOOL RefreshAllDlls() {
 
 				// unmap the KnownDlls dll
 				SET_SYSCALL(NTAPIs.NtUnmapViewOfSection);
-				if (!NT_SUCCESS((STATUS = RunSyscall(NtCurrentProcess(), KnownDllDllModule)))) {
+				if (STATUS = RunSyscall(NtCurrentProcess(), KnownDllDllModule) != 0x00 ) {
 #ifdef DEBUG
 					PRINTA("[!] NtUnmapViewOfSection Failed With Status : 0x%0.8X \n", STATUS);
 #endif // DEBUG
