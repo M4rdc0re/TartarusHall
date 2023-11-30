@@ -231,9 +231,9 @@ BOOL RefreshAllDlls() {
 		PLDR_DATA_TABLE_ENTRY	pLdrData = (PLDR_DATA_TABLE_ENTRY)((PBYTE)Next - offsetof(LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks));
 		PUNICODE_STRING			DllName = (PUNICODE_STRING)((PBYTE)&pLdrData->FullDllName + sizeof(UNICODE_STRING));
 
-		// if not win32u.dll, bcz our rop gadgets are in 'win32u.dll' (and we need to keep it RX)
+		// if not win32u.dll, because our rop gadgets are in 'win32u.dll' (and we need to keep it RX)
 		if (HASH(DllName->Buffer) != win32udll_CRC32 && HASH(DllName->Buffer) != WIN32UDLL_CRC32) {
-			// getting the dll's handle from \KnownDlls\ : in case it returned null, that's ok, cz the dll may not be in KnownDlls after all ...
+			// getting the dll's handle from \KnownDlls\ : in case it returned null, that's ok, because the dll may not be in KnownDlls after all ...
 			KnownDllDllModule = GetDllFromKnownDll(DllName->Buffer);
 			CurrentDllModule = (LPVOID)(pLdrData->DllBase);
 

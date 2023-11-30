@@ -16,11 +16,10 @@
     (p)->SecurityQualityOfService = NULL;               \
 }
 
-typedef struct {
-	DWORD	Length;         
-	DWORD	MaximumLength;  
-	PVOID	Buffer;         
-
+typedef struct _UNICODE_STRING {
+	DWORD	Length;
+	DWORD	MaximumLength;
+	PVOID	Buffer;
 } USTRING;
 
 typedef struct _THREADENTRY32 {

@@ -89,15 +89,9 @@ BOOL SearchForRop(OUT PVOID* ppRopAddress) {
 	while (pDte) {
 
 		if (pDte->FullDllName.Length != NULL) {
-			// define 'SEARCH_ALL_DLLS' to search all the loaded modules - not recommended tho
-			// cuz if an ROP is found outside of win32udll, it will be an RW .text section (will be done later when unhooking), 
-			// and thus the process will crash
-#ifdef SEARCH_ALL_DLLS
-			if (i >= 2) {
-#else		
+
 			// search only in 'win32udll' because its the only module to be RX when unhooking
 			if (HASH(pDte->FullDllName.Buffer) == win32udll_CRC32 || HASH(pDte->FullDllName.Buffer) == WIN32UDLL_CRC32) {
-#endif // SEARCH_ALL
 
 #ifdef DEBUG
 				PRINTW(L">>> Searching in \"%s\" ... \n", pDte->FullDllName.Buffer)
