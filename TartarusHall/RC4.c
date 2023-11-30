@@ -7,7 +7,7 @@ BOOL Rc4EncryptionViSystemFunc032(IN PBYTE pRc4Key, IN PBYTE pPayloadData, IN DW
 	// The return of SystemFunction032
 	NTSTATUS        	STATUS = NULL;
 	BYTE			RealKey[KEY_SIZE] = { 0 };
-	int			    b = 0;
+	INT			    b = 0;
 
 	// Brute forcing the key:
 	while (1) {
@@ -24,7 +24,7 @@ BOOL Rc4EncryptionViSystemFunc032(IN PBYTE pRc4Key, IN PBYTE pPayloadData, IN DW
 #endif
 
 	// Decrypting the key
-	for (int i = 0; i < KEY_SIZE; i++) {
+	for (INT i = 0; i < KEY_SIZE; i++) {
 		RealKey[i] = (BYTE)((pRc4Key[i] ^ b) - i);
 	}
 

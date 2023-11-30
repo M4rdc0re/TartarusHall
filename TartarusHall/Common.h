@@ -2,12 +2,6 @@
 #include <Windows.h>
 #include "typedefs.h"
 
-#define DEREF( name )		*(	UINT_PTR	*)	(name)
-#define DEREF_64( name )	*(	DWORD64		*)	(name)
-#define DEREF_32( name )	*(	DWORD		*)	(name)
-#define DEREF_16( name )	*(	WORD		*)	(name)
-#define DEREF_8( name )		*(	BYTE		*)	(name)
-
 #define KEY_SIZE 16
 #define HINT_BYTE 0x61
 
@@ -42,17 +36,17 @@
 #define NTDLLDLL_CRC32  0x6030EF91
 #define LdrLoadDll_CRC32        0x183679F2
 
-unsigned int _crc32h(char* message);
+UINT32   _crc32h(PCHAR message);
 SIZE_T	 _CharToWchar(PWCHAR Destination, PCHAR Source, SIZE_T MaximumAllowed);
 SIZE_T   _StrlenA(LPCSTR String);
 SIZE_T   _StrlenW(LPCWSTR String);
 UINT32   _CopyDotStr(PCHAR String);
 VOID	 _RtlInitUnicodeString(PUNICODE_STRING target, PCWSTR source);
 PVOID	 _memcpy(PVOID Destination, CONST PVOID Source, SIZE_T Length);
-wchar_t* _strcpy(wchar_t* dest, const wchar_t* src);
-wchar_t* _strcat(wchar_t* dest, const wchar_t* src);
+WCHAR*   _strcpy(WCHAR* dest, CONST WCHAR* src);
+WCHAR*   _strcat(WCHAR* dest, CONST WCHAR* src);
 
-#define HASH(API) _crc32h((char*)API)
+#define HASH(API) _crc32h((PCHAR)API)
 #define SET_SYSCALL(NtSys)(SetSSn((DWORD)NtSys.dwSSn,(PVOID)NtSys.pSyscallInstAddress))
 
 PTEB RtlGetThreadEnvironmentBlock();

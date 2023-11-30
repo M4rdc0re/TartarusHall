@@ -17,10 +17,10 @@ HMODULE GetModuleHandleH(DWORD dwModuleHash) {
 				CHAR DllName[MAX_PATH] = { 0 };
 				DWORD i = 0;
 				while (pDte->FullDllName.Buffer[i] && i < sizeof(DllName) - 1) {
-					if ((char)pDte->FullDllName.Buffer[i] >= 'a' && (char)pDte->FullDllName.Buffer[i] <= 'z')
-						DllName[i] = (char)pDte->FullDllName.Buffer[i] - 'a' + 'A';
+					if ((CHAR)pDte->FullDllName.Buffer[i] >= 'a' && (CHAR)pDte->FullDllName.Buffer[i] <= 'z')
+						DllName[i] = (CHAR)pDte->FullDllName.Buffer[i] - 'a' + 'A';
 					else
-						DllName[i] = (char)pDte->FullDllName.Buffer[i];
+						DllName[i] = (CHAR)pDte->FullDllName.Buffer[i];
 					i++;
 				}
 				DllName[i] = '\0';
@@ -33,7 +33,7 @@ HMODULE GetModuleHandleH(DWORD dwModuleHash) {
 			break;
 		}
 
-		pDte = (PLDR_DATA_TABLE_ENTRY)DEREF_64(pDte);
+		pDte = (PLDR_DATA_TABLE_ENTRY)*(DWORD64*)(pDte);
 	}
 
 #ifdef DEBUG
@@ -62,12 +62,12 @@ FARPROC GetProcAddressH(HMODULE hModule, DWORD dwApiHash) {
 
 
 	while (dwCounter--) {
-		char* FunctionName = (char*)(DllBaseAddress + DEREF_32(FunctionNameAddressArray));
+		PCHAR FunctionName = (PCHAR)(DllBaseAddress + *(DWORD*)(FunctionNameAddressArray));
 
 		if (HASH(FunctionName) == dwApiHash) {
-			FunctionAddressArray += (DEREF_16(FunctionOrdinalAddressArray) * sizeof(DWORD));
-			pFunctionAddress = (UINT64)(DllBaseAddress + DEREF_32(FunctionAddressArray));
-			if (pDataDir->VirtualAddress <= DEREF_32(FunctionAddressArray) && (pDataDir->VirtualAddress + pDataDir->Size) >= DEREF_32(FunctionAddressArray)) {
+			FunctionAddressArray += (*(WORD*)(FunctionOrdinalAddressArray) * sizeof(DWORD));
+			pFunctionAddress = (UINT64)(DllBaseAddress + *(DWORD*)(FunctionAddressArray));
+			if (pDataDir->VirtualAddress <= *(DWORD*)(FunctionAddressArray) && (pDataDir->VirtualAddress + pDataDir->Size) >= *(DWORD*)(FunctionAddressArray)) {
 				CHAR Library[MAX_PATH] = { 0 };
 				CHAR Function[MAX_PATH] = { 0 };
 				UINT32 Index = _CopyDotStr((PCHAR)pFunctionAddress);

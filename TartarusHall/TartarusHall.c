@@ -84,7 +84,7 @@ BOOL SearchForRop(OUT PVOID* ppRopAddress) {
 	PPEB_LDR_DATA			pLdr = (PPEB_LDR_DATA)(pPeb->LoaderData);
 	PLDR_DATA_TABLE_ENTRY	pDte = (PLDR_DATA_TABLE_ENTRY)(pLdr->InMemoryOrderModuleList.Flink);
 	// 'i' is used to skip over the local image and ntdll image
-	unsigned int			e = 0;
+	UINT32			e = 0;
 
 	while (pDte) {
 

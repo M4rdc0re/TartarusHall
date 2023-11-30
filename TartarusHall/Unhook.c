@@ -21,7 +21,7 @@ BOOL IniUnhookDirectCalls() {
 
 	// another trick ;)
 	PVOID* ppElement = (PVOID*)&WINAPIs;
-	for (int i = 0; i < sizeof(WINAPI_FUNC) / sizeof(PVOID); i++) {
+	for (INT i = 0; i < sizeof(WINAPI_FUNC) / sizeof(PVOID); i++) {
 		if (!ppElement[i]) {
 #ifdef DEBUG
 			PRINTA("[!] InitializeDirectCalls Failed To Initialize Element Of Offset : %0.2d \n", i);
@@ -249,7 +249,7 @@ BOOL RefreshAllDlls() {
 					return FALSE;
 				}
 				// get the address of the module's txt section & its size & calculate the knowndll txt section address
-				for (int i = 0; i < CurrentDllImgNtHdr->FileHeader.NumberOfSections; i++) {
+				for (INT i = 0; i < CurrentDllImgNtHdr->FileHeader.NumberOfSections; i++) {
 					PIMAGE_SECTION_HEADER pImgSec = (PIMAGE_SECTION_HEADER)((DWORD_PTR)IMAGE_FIRST_SECTION(CurrentDllImgNtHdr) + ((DWORD_PTR)IMAGE_SIZEOF_SECTION_HEADER * i));
 					if ((*(ULONG*)pImgSec->Name | 0x20202020) == 'xet.') {
 						sLocalTxtSize = pImgSec->Misc.VirtualSize;

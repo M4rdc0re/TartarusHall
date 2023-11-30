@@ -1,10 +1,10 @@
 #include <Windows.h>
 #include "Common.h"
 
-unsigned int _crc32h(char* message) {
-    int i, crc;
-    unsigned int byte, c;
-    const unsigned int g0 = SEED, g1 = g0 >> 1,
+UINT32 _crc32h(PCHAR message) {
+    INT32 i, crc;
+    UINT32 byte, c;
+    CONST UINT32 g0 = SEED, g1 = g0 >> 1,
         g2 = g0 >> 2, g3 = g0 >> 3, g4 = g0 >> 4, g5 = g0 >> 5,
         g6 = (g0 >> 6) ^ g0, g7 = ((g0 >> 6) ^ g0) >> 1;
 
@@ -16,7 +16,7 @@ unsigned int _crc32h(char* message) {
             ((crc << 29 >> 31) & g5) ^ ((crc << 28 >> 31) & g4) ^
             ((crc << 27 >> 31) & g3) ^ ((crc << 26 >> 31) & g2) ^
             ((crc << 25 >> 31) & g1) ^ ((crc << 24 >> 31) & g0);
-        crc = ((unsigned)crc >> 8) ^ c;
+        crc = ((UINT32)crc >> 8) ^ c;
         i = i + 1;
     }
     return ~crc;
@@ -67,7 +67,7 @@ VOID _RtlInitUnicodeString(PUNICODE_STRING target, PCWSTR source)
 {
     if ((target->Buffer = (PWSTR)source))
     {
-        unsigned int length = wcslen(source) * sizeof(WCHAR);
+        UINT32 length = wcslen(source) * sizeof(WCHAR);
         if (length > 0xfffc)
             length = 0xfffc;
 
@@ -88,9 +88,9 @@ PVOID _memcpy(PVOID Destination, CONST PVOID Source, SIZE_T Length)
     return Destination;
 }
 
-wchar_t* _strcpy(wchar_t* dest, const wchar_t* src)
+WCHAR* _strcpy(WCHAR* dest, CONST WCHAR* src)
 {
-    wchar_t* p;
+    WCHAR* p;
 
     if ((dest == NULL) || (src == NULL))
         return dest;
@@ -109,7 +109,7 @@ wchar_t* _strcpy(wchar_t* dest, const wchar_t* src)
     return dest;
 }
 
-wchar_t* _strcat(wchar_t* dest, const wchar_t* src)
+WCHAR* _strcat(WCHAR* dest, CONST WCHAR* src)
 {
     if ((dest == NULL) || (src == NULL))
         return dest;
