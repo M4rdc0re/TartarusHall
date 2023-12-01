@@ -71,7 +71,7 @@ BOOL InitializeNtSyscalls() {
 	return TRUE;
 }
 
-int main() {
+INT main() {
 
 	NTSTATUS	STATUS = NULL;
 	PVOID		pAddress = NULL;

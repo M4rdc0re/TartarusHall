@@ -5,7 +5,7 @@
 
 .code
 
-        SetSSn proc
+	SetSSn proc
 		xor eax, eax                          ; eax = 0
 		mov wSystemCall, eax                  ; wSystemCall = 0
 		mov qSyscallInsAdress, rax            ; qSyscallInsAdress = 0
@@ -14,10 +14,10 @@
 		mov r8, rdx                           ; r8 = AddressOfASyscallInst
 		mov qSyscallInsAdress, r8             ; qSyscallInsAdress = r8 = AddressOfASyscallInst
 		ret
-        SetSSn endp
+	SetSSn endp
 
 
-        RunSyscall proc
+	RunSyscall proc
 		xor r10, r10                          ; r10 = 0
 		mov rax, rcx                          ; rax = rcx
 		mov r10, rax                          ; r10 = rax = rcx
@@ -31,6 +31,6 @@
 		xor r10, r10                        ; r10 = 0
 		mov qSyscallInsAdress, r10          ; qSyscallInsAdress = 0
 		ret
-      RunSyscall endp
+	RunSyscall endp
 
 end
