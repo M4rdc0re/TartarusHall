@@ -13,11 +13,9 @@ BOOL IniUnhookDirectCalls() {
 	if (!hKernel32)
 		return FALSE;
 
-
 	WINAPIs.pCreateToolhelp32Snapshot = (fnCreateToolhelp32Snapshot)GetProcAddressH(hKernel32, CreateToolhelp32Snapshot_CRC32);
 	WINAPIs.pThread32First = (fnThread32First)GetProcAddressH(hKernel32, Thread32First_CRC32);
 	WINAPIs.pThread32Next = (fnThread32Next)GetProcAddressH(hKernel32, Thread32Next_CRC32);
-	WINAPIs.pCloseHandle = (fnCloseHandle)GetProcAddressH(hKernel32, CloseHandle_CRC32);
 
 	// another trick ;)
 	PVOID* ppElement = (PVOID*)&WINAPIs;
@@ -81,7 +79,8 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 #ifdef DEBUG
 		PRINTA("[!] CreateToolhelp32Snapshot Failed With Error : %d \n", GetLastError());
 #endif // DEBUG
-		WINAPIs.pCloseHandle(hSnapShot);
+		SET_SYSCALL(NTAPIs.NtClose);
+		RunSyscall(hSnapShot);
 		return FALSE;
 	}
 
@@ -89,7 +88,8 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 #ifdef DEBUG
 		PRINTA("[!] Thread32First Failed With Error : %d \n", GetLastError());
 #endif // DEBUG
-		WINAPIs.pCloseHandle(hSnapShot);
+		SET_SYSCALL(NTAPIs.NtClose);
+		RunSyscall(hSnapShot);
 		return FALSE;
 	}
 
@@ -152,7 +152,8 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 	PRINTA("\n");
 #endif // DEBUG
 
-	WINAPIs.pCloseHandle(hSnapShot);
+	SET_SYSCALL(NTAPIs.NtClose);
+	RunSyscall(hSnapShot);
 	return TRUE;
 }
 

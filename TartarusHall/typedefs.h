@@ -16,10 +16,6 @@ typedef BOOL(WINAPI* fnThread32Next)(
 	LPTHREADENTRY32		lpte
 );
 
-typedef BOOL(WINAPI* fnCloseHandle)(
-	HANDLE				hObject
-);
-
 typedef NTSTATUS(NTAPI* fnLdrLoadDll)(
 	PWCHAR             PathToFile,
 	ULONG              Flags,

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TartarusHall", "TartarusHall\TartarusHall.vcxproj", "{0D9A297B-DBD3-45E0-87C9-2C3B85BA2735}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hasher", "Hasher\Hasher.vcxproj", "{5610248C-4B2F-45F1-8633-D8AFAA549DE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{0D9A297B-DBD3-45E0-87C9-2C3B85BA2735}.Release|x64.Build.0 = Release|x64
 		{0D9A297B-DBD3-45E0-87C9-2C3B85BA2735}.Release|x86.ActiveCfg = Release|Win32
 		{0D9A297B-DBD3-45E0-87C9-2C3B85BA2735}.Release|x86.Build.0 = Release|Win32
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Debug|x64.ActiveCfg = Debug|x64
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Debug|x64.Build.0 = Debug|x64
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Debug|x86.ActiveCfg = Debug|Win32
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Debug|x86.Build.0 = Debug|Win32
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Release|x64.ActiveCfg = Release|x64
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Release|x64.Build.0 = Release|x64
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Release|x86.ActiveCfg = Release|Win32
+		{5610248C-4B2F-45F1-8633-D8AFAA549DE3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
