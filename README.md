@@ -10,8 +10,7 @@
 
 ### Usage
 * Hasher to calculate syscall hashes
-* ProtectedKey to generate a encrypted key
-* KeyGuard to encrypt payload
+* RC4Encrypt to generate a encrypted key and encrypt the payload
 
 ### Credits
 * Maldev Academy (https://maldevacademy.com/)
