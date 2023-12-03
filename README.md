@@ -19,3 +19,6 @@
 * HellsHall (https://github.com/Maldev-Academy/HellHall)
 * AtomLdr (https://github.com/NUL0x4C/AtomLdr)
 * APCLdr (https://github.com/NUL0x4C/APCLdr)
+
+## Disclaimer
+This repository is created for educational purposes only. Any legal responsibility belongs to the person or organization that uses it.
