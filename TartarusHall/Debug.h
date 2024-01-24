@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 
-// uncomment to enable debug mode
 //\
 #define DEBUG
 
@@ -32,4 +31,4 @@ HANDLE   GetConsoleHandle();
             HeapFree( GetProcessHeap(), 0, buf );                                           \
         }                                                                                   \
     }  
-#endif // DEBUG
+#endif

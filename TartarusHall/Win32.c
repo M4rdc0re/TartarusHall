@@ -10,7 +10,7 @@ UINT32 _crc32h(PCHAR message) {
 
     i = 0;
     crc = 0xFFFFFFFF;
-    while ((byte = message[i]) != 0) {    // Get next byte.
+    while ((byte = message[i]) != 0) {
         crc = crc ^ byte;
         c = ((crc << 31 >> 31) & g7) ^ ((crc << 30 >> 31) & g6) ^
             ((crc << 29 >> 31) & g5) ^ ((crc << 28 >> 31) & g4) ^
@@ -125,4 +125,15 @@ WCHAR* _strcat(WCHAR* dest, CONST WCHAR* src)
 
     *dest = 0;
     return dest;
+}
+
+extern VOID* __cdecl memset(VOID*, INT, size_t);
+#pragma intrinsic(memset)
+#pragma function(memset)
+VOID* __cdecl memset(VOID* pTarget, INT value, size_t cbTarget) {
+    PUCHAR p = (PUCHAR)pTarget;
+    while (cbTarget-- > 0) {
+        *p++ = (UCHAR)value;
+    }
+    return pTarget;
 }

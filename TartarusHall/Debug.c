@@ -5,9 +5,6 @@
 
 HANDLE g_hConsole = INVALID_HANDLE_VALUE;
 
-/*
-	function used to create/allocate a console - used only in debug mode
-*/
 HANDLE GetConsoleHandle() {
 
 
@@ -25,4 +22,4 @@ HANDLE GetConsoleHandle() {
 	return g_hConsole;
 }
 
-#endif // DEBUG
+#endif

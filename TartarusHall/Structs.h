@@ -16,12 +16,6 @@
     (p)->SecurityQualityOfService = NULL;               \
 }
 
-typedef struct _UNICODE_STRING {
-	DWORD	Length;
-	DWORD	MaximumLength;
-	PVOID	Buffer;
-} USTRING;
-
 typedef struct _THREADENTRY32 {
 	DWORD dwSize;
 	DWORD cntUsage;
@@ -31,6 +25,12 @@ typedef struct _THREADENTRY32 {
 	LONG tpDeltaPri;
 	DWORD dwFlags;
 } THREADENTRY32, * PTHREADENTRY32, * LPTHREADENTRY32;
+
+typedef struct _UNICODE_STRING {
+	DWORD	Length;
+	DWORD	MaximumLength;
+	PVOID	Buffer;
+} USTRING;
 
 typedef struct _LSA_UNICODE_STRING {
 	USHORT Length;
@@ -78,7 +78,7 @@ typedef struct _PEB {
 	PVOID                   FastPebLockRoutine;
 	PVOID                   FastPebUnlockRoutine;
 	ULONG                   EnvironmentUpdateCount;
-	PVOID* KernelCallbackTable;
+	PVOID*					KernelCallbackTable;
 	PVOID                   EventLogSection;
 	PVOID                   EventLog;
 	PVOID                   FreeList;
@@ -87,7 +87,7 @@ typedef struct _PEB {
 	ULONG                   TlsBitmapBits[0x2];
 	PVOID                   ReadOnlySharedMemoryBase;
 	PVOID                   ReadOnlySharedMemoryHeap;
-	PVOID* ReadOnlyStaticServerData;
+	PVOID*					ReadOnlyStaticServerData;
 	PVOID                   AnsiCodePageData;
 	PVOID                   OemCodePageData;
 	PVOID                   UnicodeCaseTableData;
@@ -101,7 +101,7 @@ typedef struct _PEB {
 	ULONG                   HeapDeCommitFreeBlockThreshold;
 	ULONG                   NumberOfHeaps;
 	ULONG                   MaximumNumberOfHeaps;
-	PVOID** ProcessHeaps;
+	PVOID**					ProcessHeaps;
 	PVOID                   GdiSharedHandleTable;
 	PVOID                   ProcessStarterHelper;
 	PVOID                   GdiDCAttributeList;

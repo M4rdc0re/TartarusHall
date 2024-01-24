@@ -13,7 +13,7 @@ unsigned int _crc32h(char* message) {
 
 	i = 0;
 	crc = 0xFFFFFFFF;
-	while ((byte = message[i]) != 0) {    // Get next byte.
+	while ((byte = message[i]) != 0) {
 		crc = crc ^ byte;
 		c = ((crc << 31 >> 31) & g7) ^ ((crc << 30 >> 31) & g6) ^
 			((crc << 29 >> 31) & g5) ^ ((crc << 28 >> 31) & g4) ^
