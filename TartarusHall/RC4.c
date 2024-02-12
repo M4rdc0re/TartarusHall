@@ -2,7 +2,7 @@
 #include "Common.h"
 #include "Debug.h"
 
-BOOL Rc4EncryptionViSystemFunc032(IN PBYTE pRc4Key, IN PBYTE pPayloadData, IN DWORD dwRc4KeySize, IN DWORD sPayloadSize) {
+BOOL Rc4EncryptionViSystemFunc032(PBYTE pRc4Key, PBYTE pPayloadData, DWORD dwRc4KeySize, DWORD sPayloadSize) {
 
 	NTSTATUS        	STATUS = NULL;
 	BYTE			RealKey[KEY_SIZE] = { 0 };

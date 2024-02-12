@@ -150,7 +150,7 @@ BOOL SuspendAndResumeLocalThreads(enum THREADS State) {
 	return TRUE;
 }
 
-LPVOID GetDllFromKnownDll(IN PWSTR DllName) {
+LPVOID GetDllFromKnownDll(PWSTR DllName) {
 
 	PVOID				pModule = 0x00;
 	HANDLE				hSection = 0x00;

